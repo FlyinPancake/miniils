@@ -1,6 +1,5 @@
 <script>
-	import { Stack, Button, Space, Group } from '@svelteuidev/core';
-	import TextInput from '$components/inputs/TextInput.svelte';
+	import { Stack, Button, Space, Group, TextInput } from '@svelteuidev/core';
 
 	let shelfName = '';
 </script>
@@ -12,12 +11,8 @@
 
 <Group position="center" width="50%" grow>
 	<form action="?/add_shelf" method="post">
-		<TextInput
-			bind:value={shelfName}
-			id="shelfName"
-			label="Shelf Name"
-			placeholder="i.e.: Study bookshelf"
-		/>
+		<TextInput bind:value={shelfName} label="Shelf Name" placeholder="i.e.: Study bookshelf" />
+		<input type="hidden" name="shelfName" id="shelfName" bind:value={shelfName} />
 		<Space h="md" />
 		<center>
 			<Button fullSize>Add Shelf</Button>
