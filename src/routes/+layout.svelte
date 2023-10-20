@@ -1,53 +1,66 @@
-<script>
-	import Header from './Header.svelte';
-	import './styles.css';
+<script lang="ts">
+	import {
+		colorScheme,
+		SvelteUIProvider,
+		Text,
+		AppShell,
+		Header,
+		Group,
+		Button
+	} from '@svelteuidev/core';
+	import type { LayoutServerData } from './$types';
+	import Login from './Login.svelte';
+	import ThemeSwitcher from './ThemeSwitcher.svelte';
+	import { writable } from 'svelte/store';
+	import { onMount } from 'svelte';
+
+	const isDark = writable(false);
+	onMount(() => {
+		$isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+	});
+
+	function toggleTheme() {
+		$isDark = !$isDark;
+	}
+
+	$: {
+		if ($isDark) {
+			$colorScheme = 'dark';
+		} else {
+			$colorScheme = 'light';
+		}
+	}
+
+	let loginModalOpened = false;
+	function openLoginModal() {
+		loginModalOpened = true;
+	}
+
+	export let data: LayoutServerData;
 </script>
 
-<div class="app">
-	<Header />
+<SvelteUIProvider withGlobalStyles withNormalizeCSS themeObserver={$colorScheme}>
+	<AppShell override={{ padding: '0px' }} height="100%" class="app-shell h-full flex flex-col">
+		<Header height="40px">
+			<Group position="apart">
+				<Text>miniILS</Text>
+				<Group>
+					<ThemeSwitcher {isDark} {toggleTheme} />
+					{#if data.user}
+						<Button href="/logout">Logout</Button>
+					{:else}
+						<Button on:click={openLoginModal}>Login</Button>
+					{/if}
+				</Group>
+			</Group>
+		</Header>
+		<slot class="container flex-grow" />
+		<Login bind:opened={loginModalOpened} />
+	</AppShell>
+</SvelteUIProvider>
 
-	<main>
-		<slot />
-	</main>
-
-	<footer>
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
-	</footer>
-</div>
-
-<style>
-	.app {
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
-	}
-
+<style global>
 	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 64rem;
-		margin: 0 auto;
-		box-sizing: border-box;
-	}
-
-	footer {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 12px;
-	}
-
-	footer a {
-		font-weight: bold;
-	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 12px 0;
-		}
+		padding: 0px;
 	}
 </style>
